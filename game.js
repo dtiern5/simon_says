@@ -7,13 +7,17 @@ let level = 0;
 
 $(".btn").click(function () {
   let userChosenColor = $(this).attr("id");
+
   animatePress(userChosenColor);
   userClickedPattern.push(userChosenColor);
   playSound(userChosenColor);
   console.log(userClickedPattern);
+
+  checkAnswer(userClickedPattern.length - 1);
 });
 
 function nextSequence() {
+  userClickedPattern = [];
   level++;
   $("#level-title").text("Level " + level);
 
@@ -26,7 +30,7 @@ function nextSequence() {
 }
 
 function playSound(name) {
-  var audio = new Audio("sounds/" + name + ".mp3");
+  let audio = new Audio("sounds/" + name + ".mp3");
   audio.play();
 }
 
@@ -44,3 +48,36 @@ $(document).keypress(function() {
     gameStarted = true;
   }
 });
+
+function checkAnswer(currentLevel) {
+  if (userClickedPattern[currentLevel] === gamePattern[currentLevel]) {
+    console.log("success");
+
+    if (userClickedPattern.length === gamePattern.length) {
+      setTimeout(function() {
+        nextSequence();
+      }, 1000);
+    }
+  }
+  else {
+    console.log("failure");
+    let audio = new Audio("sounds/wrong.mp3");
+
+    $("body").addClass("game-over");
+    setTimeout(function() {
+      $("body").removeClass("game-over")
+    }, 200);
+
+    audio.play();
+    $("#level-title").text("You lost on level " + level + ", try again?");
+    startOver();
+  }
+}
+
+
+
+function startOver() {
+  level = 0;
+  gameStarted = false;
+  gamePattern = [];
+}
